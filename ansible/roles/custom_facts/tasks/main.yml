@@ -1,0 +1,10 @@
+---
+- name: create /etc/ansible/facts.d
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: drop the template
+  template:
+    src: facts.j2
+    dest: /etc/ansible/facts.d/ec2.fact

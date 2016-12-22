@@ -1,0 +1,22 @@
+---
+- name: Set custom facts
+  hosts: all
+
+  roles:
+    - role: custom_facts
+      become: yes
+
+- name: Consume custom facts
+  hosts: all
+
+  vars_files:
+    - "vars/{{ ansible_local.ec2.var_file }}"
+
+  tasks:
+    - name: print local facts
+      debug:
+        var: ansible_local.ec2
+
+    - name: print contents of dynamic var file
+      debug:
+        var: val1
