@@ -1,5 +1,6 @@
 ---
 - name: Set custom facts
+  gather_facts: no
   hosts: all
 
   roles:
@@ -7,10 +8,18 @@
       become: yes
 
 - name: Consume custom facts
+  gather_facts: yes
+  become: yes
   hosts: all
 
   vars_files:
     - "vars/{{ ansible_local.ec2.var_file }}"
+
+  roles:
+    - role: geerlingguy.ruby
+
+    - role: erumble.nginx
+      nginx_remove_default_vhost: no
 
   tasks:
     - name: print local facts
@@ -20,3 +29,13 @@
     - name: print contents of dynamic var file
       debug:
         var: val1
+
+    - name: update /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ item.ip }}    {{ item.hostname }}"
+        regexp: ".*{{ item.hostname }}$"
+        state: present
+        insertafter: EOF
+      with_items:
+        "{{ etc_hosts | default([]) }}"
